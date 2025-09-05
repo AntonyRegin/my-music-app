@@ -11,9 +11,10 @@
   <div id="timestamp"></div>
   <div class="container">
     <div class="player-card">
-  <!-- Album cover removed -->
+      <img id="album-art" src="cover.png" alt="Album Art" />
       <div class="track-info">
-        <span id="track-title">Loading...</span>
+        <span id="track-title">Loading...</span><br>
+        <span id="track-artist" style="font-size:1rem;opacity:0.8;font-weight:400;"></span>
       </div>
       <div class="controls">
         <button id="prev" class="glow-btn">&#9664;</button>
@@ -29,6 +30,7 @@
     </div>
     <div class="playlist-card">
       <h2>Playlist</h2>
+      <input type="text" id="search-bar" placeholder="Search songs..." style="width:90%;margin-bottom:1rem;padding:0.6rem 1rem;border-radius:1.2rem;border:none;outline:none;font-size:1rem;background:rgba(255,255,255,0.18);color:#232526;backdrop-filter:blur(4px);">
       <ul id="playlist"></ul>
     </div>
   </div>

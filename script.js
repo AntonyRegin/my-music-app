@@ -1,3 +1,5 @@
+const searchBarEl = document.getElementById('search-bar');
+let filteredPlaylist = [];
 // Timestamp display
 const timestampEl = document.getElementById('timestamp');
 
@@ -22,7 +24,8 @@ const songsFolder = 'songs/';
 const defaultCover = 'cover.png'; // Place a default image in your repo
 const playlistEl = document.getElementById('playlist');
 const trackTitleEl = document.getElementById('track-title');
-// const coverEl = document.getElementById('cover');
+const albumArtEl = document.getElementById('album-art');
+const trackArtistEl = document.getElementById('track-artist');
 const playBtn = document.getElementById('play');
 const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
@@ -56,6 +59,7 @@ async function fetchPlaylist() {
   { "title": "Rolex Theme", "file": "Rolex Theme.mp3" }
     ];
   }
+  filteredPlaylist = playlist;
   renderPlaylist();
   loadTrack(0);
   // Wait for user interaction to start playback
@@ -63,26 +67,33 @@ async function fetchPlaylist() {
 
 function renderPlaylist() {
   playlistEl.innerHTML = '';
-  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
+  let order = isShuffling ? shuffledOrder : Array.from(filteredPlaylist.keys());
   order.forEach((idx) => {
-    const track = playlist[idx];
+    const track = filteredPlaylist[idx];
     const li = document.createElement('li');
     li.textContent = track.title;
-    li.className = idx === currentTrack ? 'active' : '';
+    li.className = playlist.indexOf(track) === currentTrack ? 'active' : '';
     li.onclick = () => {
-      loadTrack(idx);
-      playTrack(); // Autoplay on track select
+      loadTrack(playlist.indexOf(track));
+      playTrack();
     };
     playlistEl.appendChild(li);
   });
 }
+searchBarEl.addEventListener('input', function() {
+  const query = this.value.toLowerCase();
+  filteredPlaylist = playlist.filter(track => track.title.toLowerCase().includes(query) || (track.artist && track.artist.toLowerCase().includes(query)));
+  renderPlaylist();
+});
 
 function loadTrack(idx) {
   currentTrack = idx;
   const track = playlist[idx];
   audio.src = songsFolder + track.file;
   trackTitleEl.textContent = track.title;
-  // coverEl is removed from HTML, so skip setting src
+  trackArtistEl.textContent = track.artist || '';
+  albumArtEl.src = track.cover ? songsFolder + track.cover : 'cover.png';
+  albumArtEl.onerror = () => { albumArtEl.src = 'cover.png'; };
   renderPlaylist();
   resetProgress();
 }
