@@ -20,11 +20,7 @@
     font-size: 1.3rem;
     margin: 0.3rem auto 0.1rem auto;
   }
-  #album-art {
-    width: 100px;
-    height: 100px;
-    margin-bottom: 1rem;
-  }
+  /* Removed album-art styles */
   .controls {
     gap: 1rem;
     margin-bottom: 1rem;
@@ -301,14 +297,10 @@ body {
 }
 
 
-#album-art {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
+/* Removed album-art styles */
   box-shadow: 0 4px 32px #43cea2, 0 0 32px #ff6e7f99;
   margin-bottom: 1.5rem;
   background: rgba(255,255,255,0.18);
   border: 2.5px solid rgba(255,255,255,0.25);
 }
-}
+/* End of file - removed stray closing brace */

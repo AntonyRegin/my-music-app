@@ -24,9 +24,6 @@ window.onload = function() {
   const audio = document.getElementById('audio');
   const timestampEl = document.querySelector('.controls #timestamp');
 
-  // --- State ---
-  let playlist = [];
-  let playOrder = [];
   window.onload = function() {
     // --- DOM Elements ---
     const themeToggleBtn = document.getElementById('theme-toggle');
@@ -47,7 +44,7 @@ window.onload = function() {
     const progressBar = document.getElementById('progress');
     const searchBarEl = document.getElementById('search-bar');
     const audio = document.getElementById('audio');
-    const timestampEl = document.querySelector('.controls #timestamp');
+    const timestampEl = document.getElementById('timestamp');
 
     // --- State ---
     let playlist = [];
@@ -208,6 +205,8 @@ window.onload = function() {
       const s = sec % 60;
       return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
+    fetchPlaylist();
+  }
     fetchPlaylist();
   }
   let isRepeat = false;
@@ -394,4 +393,4 @@ window.onload = function() {
 
   // --- Start ---
   fetchPlaylist();
-}
+// End of window.onload
