@@ -74,7 +74,12 @@ function renderPlaylist() {
 // --- Track Loading ---
 function loadTrack(idx) {
   const track = playlist[idx];
+  if (!audio) {
+    alert('Audio element not found!');
+    return;
+  }
   audio.src = songsFolder + track.file;
+  audio.load();
   trackTitleEl.textContent = track.title;
   trackArtistEl.textContent = track.artist || '';
   albumArtEl.src = track.cover ? songsFolder + track.cover : defaultCover;
@@ -85,9 +90,11 @@ function loadTrack(idx) {
 
 // --- Playback Controls ---
 function playTrack() {
-  audio.play();
-  isPlaying = true;
-  playBtn.innerHTML = '&#10073;&#10073;';
+  if (audio) {
+    audio.play();
+    isPlaying = true;
+    playBtn.innerHTML = '&#10073;&#10073;';
+  }
 }
 
 function pauseTrack() {
