@@ -143,8 +143,8 @@ body {
   margin-bottom: 2rem;
 }
 .glow-btn {
-  background: rgba(255,255,255,0.22);
-  border: none !important;
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.18);
   outline: none !important;
   border-radius: 50%;
   width: 56px;
@@ -153,7 +153,7 @@ body {
   font-size: 2rem;
   box-shadow: 0 0 12px #43cea2, 0 0 32px #43cea233;
   cursor: pointer;
-  transition: box-shadow 0.2s, background 0.2s, color 0.2s;
+  transition: box-shadow 0.2s, background 0.2s, color 0.2s, border 0.2s;
   backdrop-filter: blur(4px);
 }
 .glow-btn:hover {
