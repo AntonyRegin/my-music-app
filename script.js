@@ -3,7 +3,7 @@ const songsFolder = 'songs/';
 const defaultCover = 'cover.png'; // Place a default image in your repo
 const playlistEl = document.getElementById('playlist');
 const trackTitleEl = document.getElementById('track-title');
-const coverEl = document.getElementById('cover');
+// const coverEl = document.getElementById('cover');
 const playBtn = document.getElementById('play');
 const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
@@ -60,7 +60,7 @@ function loadTrack(idx) {
   const track = playlist[idx];
   audio.src = songsFolder + track.file;
   trackTitleEl.textContent = track.title;
-  coverEl.src = defaultCover;
+  // coverEl is removed from HTML, so skip setting src
   renderPlaylist();
   resetProgress();
 }
@@ -136,10 +136,7 @@ function resetProgress() {
   progressBar.style.width = '0%';
 }
 
-// Responsive cover image fallback
-coverEl.onerror = () => {
-  coverEl.src = defaultCover;
-};
+// Cover image removed from HTML, so no error handler needed
 
 // Start
 fetchPlaylist();
