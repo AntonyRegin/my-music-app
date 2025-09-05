@@ -125,6 +125,7 @@ function renderPlaylist() {
       // Find the index in the main playlist
       const mainIdx = playlist.findIndex(t => t.file === track.file);
       loadTrack(mainIdx);
+      audio.autoplay = true;
       playTrack();
     };
     playlistEl.appendChild(li);
