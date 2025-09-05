@@ -1,4 +1,12 @@
 // --- DOM Elements ---
+const themeToggleBtn = document.getElementById('theme-toggle');
+let isDarkMode = true;
+
+themeToggleBtn.onclick = function() {
+  isDarkMode = !isDarkMode;
+  document.body.classList.toggle('light-mode', !isDarkMode);
+  themeToggleBtn.textContent = isDarkMode ? '🌙' : '☀️';
+};
 const songsFolder = 'songs/';
 const defaultCover = 'cover.png';
 const playlistEl = document.getElementById('playlist');
