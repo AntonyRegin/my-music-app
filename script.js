@@ -43,7 +43,7 @@ themeToggleBtn.onclick = function() {
 const searchBarEl = document.getElementById('search-bar');
 let filteredPlaylist = [];
 // Timestamp display
-const timestampEl = document.getElementById('timestamp');
+const timestampEl = document.querySelector('.controls #timestamp');
 
 function updateTimestamp() {
   if (!audio.duration) {
@@ -213,9 +213,14 @@ repeatBtn.onclick = () => {
 
 audio.addEventListener('ended', () => {
   if (isRepeat) {
+    audio.currentTime = 0;
     playTrack();
   } else {
-    nextBtn.click();
+    let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
+    let idx = order.indexOf(currentTrack);
+    idx = (idx + 1) % order.length;
+    loadTrack(order[idx]);
+    playTrack();
   }
 });
 
