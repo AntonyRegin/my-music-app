@@ -39,6 +39,8 @@ const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
 const shuffleBtn = document.getElementById('shuffle');
 const progressBar = document.getElementById('progress');
+const repeatBtn = document.getElementById('repeat');
+let isRepeat = false;
 let audio = new Audio();
 let playlist = [];
 let currentTrack = 0;
@@ -150,15 +152,36 @@ shuffleBtn.onclick = () => {
       const j = Math.floor(Math.random() * (i + 1));
       [shuffledOrder[i], shuffledOrder[j]] = [shuffledOrder[j], shuffledOrder[i]];
     }
-    shuffleBtn.style.background = '#ff6e7f';
+    shuffleBtn.style.boxShadow = '0 0 32px #ff6e7f, 0 0 64px #43cea2';
+    shuffleBtn.style.background = '#43cea2';
+    shuffleBtn.style.color = '#232526';
   } else {
+    shuffleBtn.style.boxShadow = '';
     shuffleBtn.style.background = '';
+    shuffleBtn.style.color = '';
   }
   renderPlaylist();
 };
 
+repeatBtn.onclick = () => {
+  isRepeat = !isRepeat;
+  if (isRepeat) {
+    repeatBtn.style.boxShadow = '0 0 32px #ff6e7f, 0 0 64px #43cea2';
+    repeatBtn.style.background = '#43cea2';
+    repeatBtn.style.color = '#232526';
+  } else {
+    repeatBtn.style.boxShadow = '';
+    repeatBtn.style.background = '';
+    repeatBtn.style.color = '';
+  }
+};
+
 audio.addEventListener('ended', () => {
-  nextBtn.click();
+  if (isRepeat) {
+    playTrack();
+  } else {
+    nextBtn.click();
+  }
 });
 
 audio.addEventListener('timeupdate', () => {
