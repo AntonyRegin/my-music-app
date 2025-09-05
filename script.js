@@ -39,7 +39,7 @@ async function fetchPlaylist() {
   }
   renderPlaylist();
   loadTrack(0);
-  playTrack(); // Autoplay first track on load
+  // Wait for user interaction to start playback
 }
 
 function renderPlaylist() {
