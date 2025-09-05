@@ -44,6 +44,7 @@ const searchBarEl = document.getElementById('search-bar');
 let filteredPlaylist = [];
 // Timestamp display
 const timestampEl = document.querySelector('.controls #timestamp');
+let playOrder = [];
 
 function updateTimestamp() {
   if (!audio.duration) {
@@ -104,25 +105,24 @@ async function fetchPlaylist() {
     ];
   }
   filteredPlaylist = playlist;
+  playOrder = Array.from(playlist.keys());
   renderPlaylist();
-  loadTrack(0);
+  loadTrack(playOrder[0]);
   // Wait for user interaction to start playback
 }
 
 function renderPlaylist() {
   playlistEl.innerHTML = '';
-  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
-  order.forEach((idx) => {
+  playOrder.forEach((idx) => {
     const track = playlist[idx];
     const li = document.createElement('li');
     li.textContent = track.title;
-    // Highlight active track
     if (idx === currentTrack) {
       li.className = 'active';
     }
-    // Clicking plays correct track from play order
     li.onclick = () => {
-      loadTrack(idx);
+      currentTrack = idx;
+      loadTrack(currentTrack);
       playTrack();
     };
     playlistEl.appendChild(li);
@@ -133,11 +133,17 @@ searchBarEl.addEventListener('input', function() {
   // Filter playlist and update shuffledOrder if needed
   filteredPlaylist = playlist.filter(track => track.title.toLowerCase().includes(query) || (track.artist && track.artist.toLowerCase().includes(query)));
   if (isShuffling) {
-    shuffledOrder = Array.from(filteredPlaylist.keys());
-    for (let i = shuffledOrder.length - 1; i > 0; i--) {
+    playOrder = Array.from(filteredPlaylist.keys());
+    for (let i = playOrder.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffledOrder[i], shuffledOrder[j]] = [shuffledOrder[j], shuffledOrder[i]];
+      [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
     }
+  } else {
+    playOrder = Array.from(filteredPlaylist.keys());
+  }
+  if (playOrder.length > 0) {
+    currentTrack = playOrder[0];
+    loadTrack(currentTrack);
   }
   renderPlaylist();
 });
@@ -176,36 +182,41 @@ playBtn.onclick = () => {
 };
 
 prevBtn.onclick = () => {
-  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
-  let idx = order.indexOf(currentTrack);
-  idx = (idx - 1 + order.length) % order.length;
-  loadTrack(order[idx]);
+  let idx = playOrder.indexOf(currentTrack);
+  idx = (idx - 1 + playOrder.length) % playOrder.length;
+  currentTrack = playOrder[idx];
+  loadTrack(currentTrack);
   playTrack(); // Autoplay on prev
 };
 
 nextBtn.onclick = () => {
-  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
-  let idx = order.indexOf(currentTrack);
-  idx = (idx + 1) % order.length;
-  loadTrack(order[idx]);
+  let idx = playOrder.indexOf(currentTrack);
+  idx = (idx + 1) % playOrder.length;
+  currentTrack = playOrder[idx];
+  loadTrack(currentTrack);
   playTrack(); // Autoplay on next
 };
 
 shuffleBtn.onclick = () => {
   isShuffling = !isShuffling;
   if (isShuffling) {
-    shuffledOrder = Array.from(playlist.keys());
-    for (let i = shuffledOrder.length - 1; i > 0; i--) {
+    playOrder = Array.from(filteredPlaylist.keys());
+    for (let i = playOrder.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
-      [shuffledOrder[i], shuffledOrder[j]] = [shuffledOrder[j], shuffledOrder[i]];
+      [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
     }
     shuffleBtn.style.boxShadow = '0 0 32px #ff6e7f, 0 0 64px #43cea2';
     shuffleBtn.style.background = '#43cea2';
     shuffleBtn.style.color = '#232526';
   } else {
+    playOrder = Array.from(filteredPlaylist.keys());
     shuffleBtn.style.boxShadow = '';
     shuffleBtn.style.background = '';
     shuffleBtn.style.color = '';
+  }
+  if (playOrder.length > 0) {
+    currentTrack = playOrder[0];
+    loadTrack(currentTrack);
   }
   renderPlaylist();
 };
@@ -228,14 +239,10 @@ audio.addEventListener('ended', () => {
     audio.currentTime = 0;
     playTrack();
   } else {
-    // Use correct order for next song
-    let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
-    // Find the current position in the order
-    let pos = order.findIndex(idx => idx === currentTrack);
-    if (pos === -1) pos = 0; // fallback
-    let nextPos = (pos + 1) % order.length;
-    let nextTrackIdx = order[nextPos];
-    loadTrack(nextTrackIdx);
+    let idx = playOrder.indexOf(currentTrack);
+    let nextIdx = (idx + 1) % playOrder.length;
+    currentTrack = playOrder[nextIdx];
+    loadTrack(currentTrack);
     playTrack();
   }
 });
