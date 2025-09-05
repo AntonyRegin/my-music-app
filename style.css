@@ -1,3 +1,67 @@
+body.light-mode {
+  background: linear-gradient(120deg, #f8ffae 0%, #43cea2 100%, #bfe9ff 100%);
+  color: #232526;
+}
+
+.light-mode .background-animation {
+  background: linear-gradient(270deg, #f8ffae, #bfe9ff, #43cea2, #fffde4);
+  opacity: 0.5;
+}
+
+.light-mode .player-card {
+  background: rgba(255,255,255,0.85);
+  color: #232526;
+  border: 1.5px solid rgba(67,206,162,0.18);
+}
+
+.light-mode .playlist-card {
+  background: rgba(255,255,255,0.7);
+  color: #232526;
+  border: 1.5px solid rgba(67,206,162,0.18);
+}
+
+.light-mode #playlist li {
+  background: rgba(67, 206, 162, 0.08);
+  color: #232526;
+}
+
+.light-mode #playlist li.active {
+  background: linear-gradient(90deg, #f8ffae, #43cea2);
+  color: #232526;
+}
+
+.light-mode #playlist li:hover {
+  background: #43cea2;
+  color: #fff;
+}
+
+.light-mode .glow-btn {
+  background: rgba(67,206,162,0.12);
+  color: #232526;
+}
+
+.light-mode .glow-btn:hover {
+  background: #43cea2;
+  color: #fff;
+}
+
+.light-mode #progress-bar {
+  background: rgba(67,206,162,0.12);
+}
+
+.light-mode #progress {
+  background: linear-gradient(90deg, #f8ffae, #43cea2, #bfe9ff);
+}
+
+.light-mode #album-art {
+  background: rgba(67,206,162,0.12);
+  border: 2.5px solid rgba(67,206,162,0.18);
+}
+
+.light-mode #timestamp {
+  background: rgba(255,255,255,0.7);
+  color: #232526;
+}
 body {
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;

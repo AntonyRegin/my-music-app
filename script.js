@@ -1,3 +1,11 @@
+const themeToggleBtn = document.getElementById('theme-toggle');
+let isDarkMode = true;
+
+themeToggleBtn.onclick = function() {
+  isDarkMode = !isDarkMode;
+  document.body.classList.toggle('light-mode', !isDarkMode);
+  themeToggleBtn.textContent = isDarkMode ? '🌙' : '☀️';
+};
 const searchBarEl = document.getElementById('search-bar');
 let filteredPlaylist = [];
 // Timestamp display
