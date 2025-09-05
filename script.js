@@ -224,9 +224,12 @@ audio.addEventListener('ended', () => {
   } else {
     // Use correct order for next song
     let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
-    let idx = order.indexOf(currentTrack);
-    idx = (idx + 1) % order.length;
-    loadTrack(order[idx]);
+    // Find the current position in the order
+    let pos = order.findIndex(idx => idx === currentTrack);
+    if (pos === -1) pos = 0; // fallback
+    let nextPos = (pos + 1) % order.length;
+    let nextTrackIdx = order[nextPos];
+    loadTrack(nextTrackIdx);
     playTrack();
   }
 });
