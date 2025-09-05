@@ -39,6 +39,7 @@ async function fetchPlaylist() {
   }
   renderPlaylist();
   loadTrack(0);
+  playTrack(); // Autoplay first track on load
 }
 
 function renderPlaylist() {
@@ -51,7 +52,7 @@ function renderPlaylist() {
     li.className = idx === currentTrack ? 'active' : '';
     li.onclick = () => {
       loadTrack(idx);
-      playTrack();
+      playTrack(); // Autoplay on track select
     };
     playlistEl.appendChild(li);
   });
@@ -92,7 +93,7 @@ prevBtn.onclick = () => {
   let idx = order.indexOf(currentTrack);
   idx = (idx - 1 + order.length) % order.length;
   loadTrack(order[idx]);
-  playTrack();
+  playTrack(); // Autoplay on prev
 };
 
 nextBtn.onclick = () => {
@@ -100,7 +101,7 @@ nextBtn.onclick = () => {
   let idx = order.indexOf(currentTrack);
   idx = (idx + 1) % order.length;
   loadTrack(order[idx]);
-  playTrack();
+  playTrack(); // Autoplay on next
 };
 
 shuffleBtn.onclick = () => {
