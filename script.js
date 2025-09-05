@@ -1,3 +1,22 @@
+// Timestamp display
+const timestampEl = document.getElementById('timestamp');
+
+function updateTimestamp() {
+  if (!audio.duration) {
+    timestampEl.textContent = '00:00 / 00:00';
+    return;
+  }
+  const current = formatTime(audio.currentTime);
+  const total = formatTime(audio.duration);
+  timestampEl.textContent = `${current} / ${total}`;
+}
+
+function formatTime(sec) {
+  sec = Math.floor(sec);
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
 // Music Player Script
 const songsFolder = 'songs/';
 const defaultCover = 'cover.png'; // Place a default image in your repo
@@ -126,6 +145,7 @@ audio.addEventListener('ended', () => {
 audio.addEventListener('timeupdate', () => {
   const percent = (audio.currentTime / audio.duration) * 100;
   progressBar.style.width = percent + '%';
+  updateTimestamp();
 });
 
 document.getElementById('progress-bar').onclick = (e) => {
