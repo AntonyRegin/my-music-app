@@ -7,11 +7,14 @@ const coverEl = document.getElementById('cover');
 const playBtn = document.getElementById('play');
 const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
+const shuffleBtn = document.getElementById('shuffle');
 const progressBar = document.getElementById('progress');
 let audio = new Audio();
 let playlist = [];
 let currentTrack = 0;
 let isPlaying = false;
+let isShuffling = false;
+let shuffledOrder = [];
 
 // Try to fetch all .mp3 files from the songs folder
 async function fetchPlaylist() {
@@ -38,7 +41,9 @@ async function fetchPlaylist() {
 
 function renderPlaylist() {
   playlistEl.innerHTML = '';
-  playlist.forEach((track, idx) => {
+  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
+  order.forEach((idx) => {
+    const track = playlist[idx];
     const li = document.createElement('li');
     li.textContent = track.title;
     li.className = idx === currentTrack ? 'active' : '';
@@ -81,13 +86,34 @@ playBtn.onclick = () => {
 };
 
 prevBtn.onclick = () => {
-  loadTrack((currentTrack - 1 + playlist.length) % playlist.length);
+  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
+  let idx = order.indexOf(currentTrack);
+  idx = (idx - 1 + order.length) % order.length;
+  loadTrack(order[idx]);
   playTrack();
 };
 
 nextBtn.onclick = () => {
-  loadTrack((currentTrack + 1) % playlist.length);
+  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
+  let idx = order.indexOf(currentTrack);
+  idx = (idx + 1) % order.length;
+  loadTrack(order[idx]);
   playTrack();
+};
+
+shuffleBtn.onclick = () => {
+  isShuffling = !isShuffling;
+  if (isShuffling) {
+    shuffledOrder = Array.from(playlist.keys());
+    for (let i = shuffledOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledOrder[i], shuffledOrder[j]] = [shuffledOrder[j], shuffledOrder[i]];
+    }
+    shuffleBtn.style.background = '#ff6e7f';
+  } else {
+    shuffleBtn.style.background = '';
+  }
+  renderPlaylist();
 };
 
 audio.addEventListener('ended', () => {
