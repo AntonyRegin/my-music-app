@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Music Player</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="background-animation"></div>
+  <div class="container">
+    <div class="player-card">
+  <!-- Album cover removed -->
+      <div class="track-info">
+        <span id="track-title">Loading...</span>
+      </div>
+      <div class="controls">
+        <button id="prev" class="glow-btn">&#9664;</button>
+        <button id="play" class="glow-btn">&#9654;</button>
+        <button id="next" class="glow-btn">&#9654;&#9654;</button>
+      </div>
+      <div class="progress-container">
+        <div id="progress-bar">
+          <div id="progress"></div>
+        </div>
+      </div>
+    </div>
+    <div class="playlist-card">
+      <h2>Playlist</h2>
+      <ul id="playlist"></ul>
+    </div>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
