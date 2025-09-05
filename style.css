@@ -137,28 +137,39 @@ body {
   letter-spacing: 0.04em;
   text-shadow: 0 2px 8px #43cea299;
 }
+.song-title {
+  display: block;
+  text-align: center;
+  font-size: 2rem;
+  font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin: 0.5rem auto 0.2rem auto;
+  color: #fff;
+  text-shadow: 0 2px 16px #43cea299, 0 0 8px #ff6e7f99;
+}
 .controls {
   display: flex;
   gap: 2rem;
   margin-bottom: 2rem;
 }
 .glow-btn {
-  background: transparent;
-  border: 2px solid rgba(255,255,255,0.18);
+  background: linear-gradient(135deg, #ff6e7f 0%, #43cea2 100%);
+  border: none;
   outline: none !important;
   border-radius: 50%;
   width: 56px;
   height: 56px;
   color: #fff;
   font-size: 2rem;
-  box-shadow: 0 0 12px #43cea2, 0 0 32px #43cea233;
+  box-shadow: 0 0 16px #43cea2, 0 0 32px #ff6e7f99;
   cursor: pointer;
-  transition: box-shadow 0.2s, background 0.2s, color 0.2s, border 0.2s;
-  backdrop-filter: blur(4px);
+  transition: box-shadow 0.2s, background 0.2s, color 0.2s;
+  backdrop-filter: blur(6px);
 }
 .glow-btn:hover {
   box-shadow: 0 0 32px #ff6e7f, 0 0 64px #43cea2;
-  background: #43cea2;
+  background: linear-gradient(135deg, #43cea2 0%, #ff6e7f 100%);
   color: #232526;
 }
 .progress-container {
