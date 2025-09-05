@@ -1,70 +1,6 @@
-// Visualizer setup
-const visualizerCanvas = document.getElementById('visualizer');
-const vCtx = visualizerCanvas.getContext('2d');
-let audioCtx, analyser, source;
-
-function setupVisualizer() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    analyser = audioCtx.createAnalyser();
-    analyser.fftSize = 64;
-    source = audioCtx.createMediaElementSource(audio);
-    source.connect(analyser);
-    analyser.connect(audioCtx.destination);
-  }
-  drawVisualizer();
-}
-
-function drawVisualizer() {
-  requestAnimationFrame(drawVisualizer);
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-  analyser.getByteFrequencyData(dataArray);
-  vCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
-  const barWidth = (visualizerCanvas.width / bufferLength) - 2;
-  for (let i = 0; i < bufferLength; i++) {
-    const barHeight = dataArray[i] * 0.6;
-    const x = i * (barWidth + 2);
-    vCtx.fillStyle = `linear-gradient(90deg, #ff6e7f, #43cea2, #bfe9ff)`;
-    vCtx.fillStyle = `rgba(${67 + i*2},206,162,0.8)`;
-    vCtx.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
-    vCtx.shadowColor = '#43cea2';
-    vCtx.shadowBlur = 8;
-  }
-}
-const themeToggleBtn = document.getElementById('theme-toggle');
-let isDarkMode = true;
-
-themeToggleBtn.onclick = function() {
-  isDarkMode = !isDarkMode;
-  document.body.classList.toggle('light-mode', !isDarkMode);
-  themeToggleBtn.textContent = isDarkMode ? '🌙' : '☀️';
-};
-const searchBarEl = document.getElementById('search-bar');
-let filteredPlaylist = [];
-// Timestamp display
-const timestampEl = document.querySelector('.controls #timestamp');
-let playOrder = [];
-
-function updateTimestamp() {
-  if (!audio.duration) {
-    timestampEl.textContent = '00:00 / 00:00';
-    return;
-  }
-  const current = formatTime(audio.currentTime);
-  const total = formatTime(audio.duration);
-  timestampEl.textContent = `${current} / ${total}`;
-}
-
-function formatTime(sec) {
-  sec = Math.floor(sec);
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-}
-// Music Player Script
+// --- DOM Elements ---
 const songsFolder = 'songs/';
-const defaultCover = 'cover.png'; // Place a default image in your repo
+const defaultCover = 'cover.png';
 const playlistEl = document.getElementById('playlist');
 const trackTitleEl = document.getElementById('track-title');
 const albumArtEl = document.getElementById('album-art');
@@ -75,18 +11,20 @@ const nextBtn = document.getElementById('next');
 const shuffleBtn = document.getElementById('shuffle');
 const progressBar = document.getElementById('progress');
 const repeatBtn = document.getElementById('repeat');
-let isRepeat = false;
+const searchBarEl = document.getElementById('search-bar');
 const audio = document.getElementById('audio');
+const timestampEl = document.querySelector('.controls #timestamp');
+
+// --- State ---
 let playlist = [];
-let currentTrack = 0;
+let playOrder = [];
+let currentOrderIdx = 0;
 let isPlaying = false;
 let isShuffling = false;
-let shuffledOrder = [];
+let isRepeat = false;
 
-// Try to fetch all .mp3 files from the songs folder
+// --- Playlist Fetch ---
 async function fetchPlaylist() {
-  // GitHub Pages doesn't allow directory listing, so you must hardcode or generate this list
-  // For demo, let's try to fetch a playlist.json, fallback to hardcoded
   try {
     const res = await fetch(songsFolder + 'playlist.json');
     if (res.ok) {
@@ -95,158 +33,129 @@ async function fetchPlaylist() {
       throw new Error('No playlist.json');
     }
   } catch {
-    // Fallback: hardcoded list (update with your actual files)
     playlist = [
       { "title": "JD entry", "file": "JD entry.mp3" },
       { "title": "Big bad beast", "file": "Big bad beast.mp3" },
-  { "title": "Master Entry", "file": "Master Entry.mp3" },
-  { "title": "JD badass", "file": "JD badass.mp3" },
-  { "title": "Rolex Theme", "file": "Rolex Theme.mp3" }
+      { "title": "Master Entry", "file": "Master Entry.mp3" },
+      { "title": "JD badass", "file": "JD badass.mp3" },
+      { "title": "Rolex Theme", "file": "Rolex Theme.mp3" }
     ];
   }
-  filteredPlaylist = playlist;
-  playOrder = Array.from(playlist.keys());
+  playOrder = playlist.map((_, i) => i);
   renderPlaylist();
   loadTrack(playOrder[0]);
-  // Wait for user interaction to start playback
 }
 
+// --- Playlist Rendering ---
 function renderPlaylist() {
   playlistEl.innerHTML = '';
-  playOrder.forEach((idx) => {
+  playOrder.forEach((idx, i) => {
     const track = playlist[idx];
     const li = document.createElement('li');
     li.textContent = track.title;
-    if (idx === currentTrack) {
-      li.className = 'active';
-    }
+    if (i === currentOrderIdx) li.className = 'active';
     li.onclick = () => {
-      currentTrack = idx;
-      loadTrack(currentTrack);
+      currentOrderIdx = i;
+      loadTrack(idx);
       playTrack();
     };
     playlistEl.appendChild(li);
   });
 }
-searchBarEl.addEventListener('input', function() {
-  const query = this.value.toLowerCase();
-  // Filter playlist and update shuffledOrder if needed
-  filteredPlaylist = playlist.filter(track => track.title.toLowerCase().includes(query) || (track.artist && track.artist.toLowerCase().includes(query)));
-  if (isShuffling) {
-    playOrder = Array.from(filteredPlaylist.keys());
-    for (let i = playOrder.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
-    }
-  } else {
-    playOrder = Array.from(filteredPlaylist.keys());
-  }
-  if (playOrder.length > 0) {
-    currentTrack = playOrder[0];
-    loadTrack(currentTrack);
-  }
-  renderPlaylist();
-});
 
+// --- Track Loading ---
 function loadTrack(idx) {
-  currentTrack = idx;
   const track = playlist[idx];
   audio.src = songsFolder + track.file;
   trackTitleEl.textContent = track.title;
   trackArtistEl.textContent = track.artist || '';
-  albumArtEl.src = track.cover ? songsFolder + track.cover : 'cover.png';
-  albumArtEl.onerror = () => { albumArtEl.src = 'cover.png'; };
+  albumArtEl.src = track.cover ? songsFolder + track.cover : defaultCover;
+  albumArtEl.onerror = () => { albumArtEl.src = defaultCover; };
   renderPlaylist();
   resetProgress();
 }
 
+// --- Playback Controls ---
 function playTrack() {
   audio.play();
   isPlaying = true;
-  playBtn.innerHTML = '&#10073;&#10073;'; // Pause icon
-  setupVisualizer();
+  playBtn.innerHTML = '&#10073;&#10073;';
 }
 
 function pauseTrack() {
   audio.pause();
   isPlaying = false;
-  playBtn.innerHTML = '&#9654;'; // Play icon
+  playBtn.innerHTML = '&#9654;';
 }
 
-playBtn.onclick = () => {
-  if (isPlaying) {
-    pauseTrack();
-  } else {
-    playTrack();
-  }
-};
+playBtn.onclick = () => isPlaying ? pauseTrack() : playTrack();
 
 prevBtn.onclick = () => {
-  let idx = playOrder.indexOf(currentTrack);
-  idx = (idx - 1 + playOrder.length) % playOrder.length;
-  currentTrack = playOrder[idx];
-  loadTrack(currentTrack);
-  playTrack(); // Autoplay on prev
+  currentOrderIdx = (currentOrderIdx - 1 + playOrder.length) % playOrder.length;
+  loadTrack(playOrder[currentOrderIdx]);
+  playTrack();
 };
 
 nextBtn.onclick = () => {
-  let idx = playOrder.indexOf(currentTrack);
-  idx = (idx + 1) % playOrder.length;
-  currentTrack = playOrder[idx];
-  loadTrack(currentTrack);
-  playTrack(); // Autoplay on next
+  currentOrderIdx = (currentOrderIdx + 1) % playOrder.length;
+  loadTrack(playOrder[currentOrderIdx]);
+  playTrack();
 };
 
 shuffleBtn.onclick = () => {
   isShuffling = !isShuffling;
   if (isShuffling) {
-    playOrder = Array.from(filteredPlaylist.keys());
+    playOrder = playlist.map((_, i) => i);
     for (let i = playOrder.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
     }
+    currentOrderIdx = 0;
     shuffleBtn.style.boxShadow = '0 0 32px #ff6e7f, 0 0 64px #43cea2';
     shuffleBtn.style.background = '#43cea2';
     shuffleBtn.style.color = '#232526';
   } else {
-    playOrder = Array.from(filteredPlaylist.keys());
+    playOrder = playlist.map((_, i) => i);
+    currentOrderIdx = 0;
     shuffleBtn.style.boxShadow = '';
     shuffleBtn.style.background = '';
     shuffleBtn.style.color = '';
   }
-  if (playOrder.length > 0) {
-    currentTrack = playOrder[0];
-    loadTrack(currentTrack);
-  }
+  loadTrack(playOrder[currentOrderIdx]);
   renderPlaylist();
 };
 
 repeatBtn.onclick = () => {
   isRepeat = !isRepeat;
-  if (isRepeat) {
-    repeatBtn.style.boxShadow = '0 0 32px #ff6e7f, 0 0 64px #43cea2';
-    repeatBtn.style.background = '#43cea2';
-    repeatBtn.style.color = '#232526';
-  } else {
-    repeatBtn.style.boxShadow = '';
-    repeatBtn.style.background = '';
-    repeatBtn.style.color = '';
-  }
+  repeatBtn.style.boxShadow = isRepeat ? '0 0 32px #ff6e7f, 0 0 64px #43cea2' : '';
+  repeatBtn.style.background = isRepeat ? '#43cea2' : '';
+  repeatBtn.style.color = isRepeat ? '#232526' : '';
 };
 
+// --- Search ---
+searchBarEl.addEventListener('input', function() {
+  const query = this.value.toLowerCase();
+  const filtered = playlist.map((track, i) => ({track, i}))
+    .filter(obj => obj.track.title.toLowerCase().includes(query) || (obj.track.artist && obj.track.artist.toLowerCase().includes(query)));
+  playOrder = filtered.map(obj => obj.i);
+  currentOrderIdx = 0;
+  if (playOrder.length > 0) loadTrack(playOrder[currentOrderIdx]);
+  renderPlaylist();
+});
+
+// --- Next Song on End ---
 audio.addEventListener('ended', () => {
   if (isRepeat) {
     audio.currentTime = 0;
     playTrack();
   } else {
-    let idx = playOrder.indexOf(currentTrack);
-    let nextIdx = (idx + 1) % playOrder.length;
-    currentTrack = playOrder[nextIdx];
-    loadTrack(currentTrack);
+    currentOrderIdx = (currentOrderIdx + 1) % playOrder.length;
+    loadTrack(playOrder[currentOrderIdx]);
     playTrack();
   }
 });
 
+// --- Progress Bar ---
 audio.addEventListener('timeupdate', () => {
   const percent = (audio.currentTime / audio.duration) * 100;
   progressBar.style.width = percent + '%';
@@ -264,7 +173,22 @@ function resetProgress() {
   progressBar.style.width = '0%';
 }
 
-// Cover image removed from HTML, so no error handler needed
+function updateTimestamp() {
+  if (!audio.duration) {
+    timestampEl.textContent = '00:00 / 00:00';
+    return;
+  }
+  const current = formatTime(audio.currentTime);
+  const total = formatTime(audio.duration);
+  timestampEl.textContent = `${current} / ${total}`;
+}
 
-// Start
+function formatTime(sec) {
+  sec = Math.floor(sec);
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+
+// --- Start ---
 fetchPlaylist();
