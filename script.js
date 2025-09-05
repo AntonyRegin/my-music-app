@@ -34,8 +34,7 @@ async function fetchPlaylist() {
       { "title": "Big bad beast", "file": "Big bad beast.mp3" },
   { "title": "Master Entry", "file": "Master Entry.mp3" },
   { "title": "JD badass", "file": "JD badass.mp3" },
-  { "title": "Rolex Theme", "file": "Rolex Theme.mp3" },
-  { "title": "Pablo Santhanam", "file": "Pablo Santhanam.mp3" }
+  { "title": "Rolex Theme", "file": "Rolex Theme.mp3" }
     ];
   }
   renderPlaylist();
