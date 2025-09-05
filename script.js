@@ -1,3 +1,37 @@
+// Visualizer setup
+const visualizerCanvas = document.getElementById('visualizer');
+const vCtx = visualizerCanvas.getContext('2d');
+let audioCtx, analyser, source;
+
+function setupVisualizer() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    analyser = audioCtx.createAnalyser();
+    analyser.fftSize = 64;
+    source = audioCtx.createMediaElementSource(audio);
+    source.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+  drawVisualizer();
+}
+
+function drawVisualizer() {
+  requestAnimationFrame(drawVisualizer);
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+  analyser.getByteFrequencyData(dataArray);
+  vCtx.clearRect(0, 0, visualizerCanvas.width, visualizerCanvas.height);
+  const barWidth = (visualizerCanvas.width / bufferLength) - 2;
+  for (let i = 0; i < bufferLength; i++) {
+    const barHeight = dataArray[i] * 0.6;
+    const x = i * (barWidth + 2);
+    vCtx.fillStyle = `linear-gradient(90deg, #ff6e7f, #43cea2, #bfe9ff)`;
+    vCtx.fillStyle = `rgba(${67 + i*2},206,162,0.8)`;
+    vCtx.fillRect(x, visualizerCanvas.height - barHeight, barWidth, barHeight);
+    vCtx.shadowColor = '#43cea2';
+    vCtx.shadowBlur = 8;
+  }
+}
 const themeToggleBtn = document.getElementById('theme-toggle');
 let isDarkMode = true;
 
@@ -112,6 +146,7 @@ function playTrack() {
   audio.play();
   isPlaying = true;
   playBtn.innerHTML = '&#10073;&#10073;'; // Pause icon
+  setupVisualizer();
 }
 
 function pauseTrack() {
