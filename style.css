@@ -1,5 +1,5 @@
 body.light-mode {
-  background: linear-gradient(120deg, #f8ffae 0%, #43cea2 100%, #bfe9ff 100%);
+  background: #fff;
   color: #232526;
 }
 
@@ -65,7 +65,7 @@ body.light-mode {
 body {
   margin: 0;
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(120deg, #ff6e7f 0%, #bfe9ff 100%, #43cea2 100%);
+  background: #111;
   min-height: 100vh;
   overflow-x: hidden;
 }
@@ -100,25 +100,32 @@ body {
   border-radius: 2.5rem;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   padding: 2.5rem 2rem 2rem 2rem;
-  min-width: 340px;
-  max-width: 400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: box-shadow 0.3s;
-  backdrop-filter: blur(16px) saturate(180%);
-  border: 1.5px solid rgba(255,255,255,0.25);
+/* Timestamp now shown near buttons, not top-right */
 }
-.player-card:hover {
-  box-shadow: 0 12px 40px 0 #43cea2;
+/* Timestamp styles fixed */
+/* #timestamp {
+  position: absolute;
+  top: 1.2rem;
+  right: 2.2rem;
+  color: #fff;
+  font-size: 1.1rem;
+  background: rgba(34, 40, 49, 0.5);
+  padding: 0.4rem 1.2rem;
+  border-radius: 2rem;
+  box-shadow: 0 2px 8px #43cea233;
+  z-index: 2;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(4px);
 }
-.cover {
-  width: 180px;
+
+#album-art {
   height: 180px;
   border-radius: 1.5rem;
   box-shadow: 0 4px 24px #43cea2;
   object-fit: cover;
   margin-bottom: 1.5rem;
+  background: rgba(255,255,255,0.18);
+  border: 2.5px solid rgba(255,255,255,0.25);
 }
 .track-info {
   font-size: 1.5rem;
@@ -137,7 +144,8 @@ body {
 }
 .glow-btn {
   background: rgba(255,255,255,0.22);
-  border: none;
+  border: none !important;
+  outline: none !important;
   border-radius: 50%;
   width: 56px;
   height: 56px;
