@@ -30,9 +30,12 @@ async function fetchPlaylist() {
   } catch {
     // Fallback: hardcoded list (update with your actual files)
     playlist = [
-      { title: 'Song 1', file: 'song1.mp3' },
-      { title: 'Song 2', file: 'song2.mp3' },
-      { title: 'Song 3', file: 'song3.mp3' }
+      { "title": "JD entry", "file": "JD entry.mp3" },
+      { "title": "Big bad beast", "file": "Big bad beast.mp3" },
+  { "title": "Master Entry", "file": "Master Entry.mp3" },
+  { "title": "JD badass", "file": "JD badass.mp3" },
+  { "title": "Rolex Theme", "file": "Rolex Theme.mp3" },
+  { "title": "Pablo Santhanam", "file": "Pablo Santhanam.mp3" }
     ];
   }
   renderPlaylist();
