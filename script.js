@@ -25,18 +25,10 @@ window.onload = function() {
   const timestampEl = document.querySelector('.controls #timestamp');
 
   window.onload = function() {
-    // --- DOM Elements ---
+    // DOM references
     const themeToggleBtn = document.getElementById('theme-toggle');
-    let isDarkMode = true;
-    themeToggleBtn.onclick = function() {
-      isDarkMode = !isDarkMode;
-      document.body.classList.toggle('light-mode', !isDarkMode);
-      themeToggleBtn.textContent = isDarkMode ? '🌙' : '☀️';
-    };
-    const songsFolder = 'songs/';
-    const playlistEl = document.getElementById('playlist');
-    const trackTitleEl = document.getElementById('track-title');
     const playBtn = document.getElementById('play');
+    const playlistEl = document.getElementById('playlist');
     const prevBtn = document.getElementById('prev');
     const nextBtn = document.getElementById('next');
     const shuffleBtn = document.getElementById('shuffle');
@@ -45,19 +37,28 @@ window.onload = function() {
     const searchBarEl = document.getElementById('search-bar');
     const audio = document.getElementById('audio');
     const timestampEl = document.getElementById('timestamp');
+    const trackTitleEl = document.getElementById('track-title');
 
-    // --- State ---
+    // State variables
     let playlist = [];
     let playOrder = [];
     let currentOrderIdx = 0;
     let isPlaying = false;
     let isShuffling = false;
     let isRepeat = false;
+    let isDarkMode = true;
 
-    // --- Playlist Fetch ---
+    // Theme toggle
+    themeToggleBtn.onclick = function() {
+      isDarkMode = !isDarkMode;
+      document.body.classList.toggle('light-mode', !isDarkMode);
+      themeToggleBtn.textContent = isDarkMode ? '🌙' : '☀️';
+    };
+
+    // Fetch playlist
     async function fetchPlaylist() {
       try {
-        const res = await fetch(songsFolder + 'playlist.json');
+        const res = await fetch('./songs/playlist.json');
         if (res.ok) {
           playlist = await res.json();
         } else {
@@ -77,7 +78,7 @@ window.onload = function() {
       if (playOrder.length > 0) loadTrack(playOrder[0]);
     }
 
-    // --- Playlist Rendering ---
+    // Render playlist
     function renderPlaylist() {
       playlistEl.innerHTML = '';
       playOrder.forEach((idx, i) => {
@@ -94,18 +95,18 @@ window.onload = function() {
       });
     }
 
-    // --- Track Loading ---
+    // Load track
     function loadTrack(idx) {
       const track = playlist[idx];
       if (!audio || !track) return;
-      audio.src = songsFolder + track.file;
+      audio.src = './songs/' + track.file;
       audio.load();
       trackTitleEl.textContent = track.title;
       renderPlaylist();
       resetProgress();
     }
 
-    // --- Playback Controls ---
+    // Playback controls
     function playTrack() {
       if (audio) {
         audio.play();
@@ -205,6 +206,7 @@ window.onload = function() {
       const s = sec % 60;
       return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
     }
+    // Start
     fetchPlaylist();
   }
     fetchPlaylist();
