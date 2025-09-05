@@ -103,7 +103,7 @@ body {
 /* Timestamp now shown near buttons, not top-right */
 }
 /* Timestamp styles fixed */
-/* #timestamp {
+#timestamp {
   position: absolute;
   top: 1.2rem;
   right: 2.2rem;
