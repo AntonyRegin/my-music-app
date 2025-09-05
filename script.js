@@ -111,21 +111,18 @@ async function fetchPlaylist() {
 
 function renderPlaylist() {
   playlistEl.innerHTML = '';
-  let order = isShuffling ? shuffledOrder : Array.from(filteredPlaylist.keys());
+  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
   order.forEach((idx) => {
-    const track = filteredPlaylist[idx];
+    const track = playlist[idx];
     const li = document.createElement('li');
     li.textContent = track.title;
     // Highlight active track
-    if (playlist[currentTrack] && track.file === playlist[currentTrack].file) {
+    if (idx === currentTrack) {
       li.className = 'active';
     }
-    // Clicking plays correct track from filtered/shuffled order
+    // Clicking plays correct track from play order
     li.onclick = () => {
-      // Find the index in the main playlist
-      const mainIdx = playlist.findIndex(t => t.file === track.file);
-      loadTrack(mainIdx);
-      audio.autoplay = true;
+      loadTrack(idx);
       playTrack();
     };
     playlistEl.appendChild(li);
@@ -133,7 +130,15 @@ function renderPlaylist() {
 }
 searchBarEl.addEventListener('input', function() {
   const query = this.value.toLowerCase();
+  // Filter playlist and update shuffledOrder if needed
   filteredPlaylist = playlist.filter(track => track.title.toLowerCase().includes(query) || (track.artist && track.artist.toLowerCase().includes(query)));
+  if (isShuffling) {
+    shuffledOrder = Array.from(filteredPlaylist.keys());
+    for (let i = shuffledOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledOrder[i], shuffledOrder[j]] = [shuffledOrder[j], shuffledOrder[i]];
+    }
+  }
   renderPlaylist();
 });
 
