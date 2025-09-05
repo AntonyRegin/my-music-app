@@ -116,9 +116,15 @@ function renderPlaylist() {
     const track = filteredPlaylist[idx];
     const li = document.createElement('li');
     li.textContent = track.title;
-    li.className = playlist.indexOf(track) === currentTrack ? 'active' : '';
+    // Highlight active track
+    if (playlist[currentTrack] && track.file === playlist[currentTrack].file) {
+      li.className = 'active';
+    }
+    // Clicking plays correct track from filtered/shuffled order
     li.onclick = () => {
-      loadTrack(playlist.indexOf(track));
+      // Find the index in the main playlist
+      const mainIdx = playlist.findIndex(t => t.file === track.file);
+      loadTrack(mainIdx);
       playTrack();
     };
     playlistEl.appendChild(li);
@@ -216,6 +222,7 @@ audio.addEventListener('ended', () => {
     audio.currentTime = 0;
     playTrack();
   } else {
+    // Use correct order for next song
     let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
     let idx = order.indexOf(currentTrack);
     idx = (idx + 1) % order.length;
