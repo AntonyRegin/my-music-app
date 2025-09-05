@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Music Player</title>
+  <title>Music Player</title>
   <link rel="stylesheet" href="style.css">
-  <!-- No favicon -->
 </head>
 <body>
   <div class="background-animation"></div>
@@ -31,7 +30,11 @@
           <div id="progress"></div>
         </div>
       </div>
-      <canvas id="visualizer" width="340" height="80" style="width:100%;max-width:340px;display:block;margin:1.2rem auto 0 auto;border-radius:1.2rem;background:rgba(255,255,255,0.08);box-shadow:0 2px 8px #43cea233;"></canvas>
+      <div class="progress-container">
+        <div id="progress-bar">
+          <div id="progress"></div>
+        </div>
+      </div>
     </div>
     <div class="playlist-card">
       <h2>Playlist</h2>
