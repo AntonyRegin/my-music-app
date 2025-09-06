@@ -276,13 +276,3 @@ body {
     padding: 0.5rem 0.7rem;
   }
 }
-#album-art {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 4px 32px #43cea2, 0 0 32px #ff6e7f99;
-  margin-bottom: 1.5rem;
-  background: rgba(255,255,255,0.18);
-  border: 2.5px solid rgba(255,255,255,0.25);
-}
