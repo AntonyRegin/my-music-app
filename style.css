@@ -201,8 +201,12 @@ body {
   padding: 0.7rem 1rem;
   margin-bottom: 0.5rem;
   border-radius: 2rem;
-  background: rgba(67, 206, 162, 0.15);
-/* Timestamp styles fixed */
+  background: rgba(67, 206, 162, 0);
+  box-shadow: 0 2px 8px #43cea233;
+  z-index: 2;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(4px);
+}
 #timestamp {
   position: absolute;
   top: 1.2rem;
@@ -218,14 +222,6 @@ body {
   backdrop-filter: blur(4px);
   background: #43cea2;
   color: #232526;
-}
-  background: rgba(34, 40, 49, 0.5);
-  padding: 0.4rem 1.2rem;
-  border-radius: 2rem;
-  box-shadow: 0 2px 8px #43cea233;
-  z-index: 2;
-  letter-spacing: 0.05em;
-  backdrop-filter: blur(4px);
 }
 #playlist li.active {
   background: linear-gradient(90deg, #ff6e7f, #43cea2);
