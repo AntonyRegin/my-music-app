@@ -39,13 +39,11 @@ const prevBtn = document.getElementById('prev');
 const nextBtn = document.getElementById('next');
 const shuffleBtn = document.getElementById('shuffle');
 const progressBar = document.getElementById('progress');
-const repeatBtn = document.getElementById('repeat');
 let audio = new Audio();
 let playlist = [];
 let currentTrack = 0;
 let isPlaying = false;
 let isShuffling = false;
-let isRepeat = false;
 let shuffledOrder = [];
 
 // Try to fetch all .mp3 files from the songs folder
@@ -159,20 +157,8 @@ shuffleBtn.onclick = () => {
   renderPlaylist();
 };
 
-repeatBtn.onclick = () => {
-  isRepeat = !isRepeat;
-  repeatBtn.classList.toggle('active', isRepeat);
-};
-
-// Update next song logic to support repeat
 audio.addEventListener('ended', () => {
-  if (isRepeat) {
-    audio.currentTime = 0;
-    nextBtn.click();
-    playTrack();
-  } else {
-    nextBtn.click();
-  }
+  nextBtn.click();
 });
 
 audio.addEventListener('timeupdate', () => {
