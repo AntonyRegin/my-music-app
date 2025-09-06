@@ -1,206 +1,184 @@
-window.onload = function () {
-  // --- DOM Elements ---
-  const themeToggleBtn = document.getElementById('theme-toggle');
-  const playlistEl = document.getElementById('playlist');
-  const trackTitleEl = document.getElementById('track-title');
-  const playBtn = document.getElementById('play');
-  const prevBtn = document.getElementById('prev');
-  const nextBtn = document.getElementById('next');
-  const shuffleBtn = document.getElementById('shuffle');
-  const repeatBtn = document.getElementById('repeat');
-  const searchBarEl = document.getElementById('search');
-  const progressBar = document.getElementById('progress');
-  const timestampEl = document.getElementById('timestamp');
-  const audio = document.getElementById('audio');
+const themeToggleBtn = document.getElementById('theme-toggle');
+let isDarkMode = true;
 
-  // --- State ---
-  const songsFolder = 'songs/';
-  let playlist = [];
-  let playOrder = [];
-  let currentOrderIdx = 0;
-  let isPlaying = false;
-  let isShuffling = false;
-  let isRepeat = false;
-
-  // --- Theme Toggle ---
-  let isDarkMode = true;
-  themeToggleBtn.onclick = function () {
-    isDarkMode = !isDarkMode;
-    document.body.classList.toggle('light-mode', !isDarkMode);
-    themeToggleBtn.textContent = isDarkMode ? '🌙' : '☀️';
-  };
-
-  // --- Fetch Playlist ---
-  async function fetchPlaylist() {
-    try {
-      const res = await fetch('./songs/playlist.json');
-      if (res.ok) {
-        playlist = await res.json();
-      } else {
-        throw new Error('No playlist.json');
-      }
-    } catch {
-      playlist = [
-        { title: 'JD entry', file: 'JD entry.mp3' },
-        { title: 'Master Entry', file: 'Master Entry.mp3' }
-      ];
-    }
-    playOrder = playlist.map((_, i) => i);
-    currentOrderIdx = 0;
-    if (playlist.length > 0) {
-      loadTrack(playOrder[currentOrderIdx]);
-    }
-    renderPlaylist();
-  }
-
-  // --- Render Playlist ---
-  function renderPlaylist() {
-    playlistEl.innerHTML = '';
-    playOrder.forEach((idx, i) => {
-      const track = playlist[idx];
-      const li = document.createElement('li');
-      li.textContent = track.title;
-      if (i === currentOrderIdx) li.className = 'active';
-      li.onclick = () => {
-        currentOrderIdx = i;
-        loadTrack(idx);
-        playTrack();
-      };
-      playlistEl.appendChild(li);
-    });
-  }
-
-  // --- Load Track ---
-  function loadTrack(idx) {
-    const track = playlist[idx];
-    if (!audio || !track) return;
-    audio.src = songsFolder + track.file;
-    audio.load();
-    trackTitleEl.textContent = track.title;
-    renderPlaylist();
-    resetProgress();
-  }
-
-  // --- Play / Pause ---
-  function playTrack() {
-    if (audio) {
-      audio.play();
-      isPlaying = true;
-      playBtn.innerHTML = '&#10073;&#10073;';
-    }
-  }
-  function pauseTrack() {
-    if (audio) {
-      audio.pause();
-      isPlaying = false;
-      playBtn.innerHTML = '&#9654;';
-    }
-  }
-  playBtn.onclick = () => (isPlaying ? pauseTrack() : playTrack());
-
-  // --- Prev / Next ---
-  prevBtn.onclick = () => {
-    if (playOrder.length === 0) return;
-    currentOrderIdx = (currentOrderIdx - 1 + playOrder.length) % playOrder.length;
-    loadTrack(playOrder[currentOrderIdx]);
-    playTrack();
-  };
-  nextBtn.onclick = () => {
-    if (playOrder.length === 0) return;
-    currentOrderIdx = (currentOrderIdx + 1) % playOrder.length;
-    loadTrack(playOrder[currentOrderIdx]);
-    playTrack();
-  };
-
-  // --- Shuffle ---
-  shuffleBtn.onclick = () => {
-    isShuffling = !isShuffling;
-    if (isShuffling) {
-      playOrder = playlist.map((_, i) => i);
-      for (let i = playOrder.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [playOrder[i], playOrder[j]] = [playOrder[j], playOrder[i]];
-      }
-      currentOrderIdx = 0;
-      shuffleBtn.classList.add('active');
-    } else {
-      playOrder = playlist.map((_, i) => i);
-      currentOrderIdx = 0;
-      shuffleBtn.classList.remove('active');
-    }
-    if (playOrder.length > 0) loadTrack(playOrder[currentOrderIdx]);
-    renderPlaylist();
-  };
-
-  // --- Repeat ---
-  repeatBtn.onclick = () => {
-    isRepeat = !isRepeat;
-    repeatBtn.classList.toggle('active', isRepeat);
-  };
-
-  // --- Search ---
-  searchBarEl.addEventListener('input', function () {
-    const query = this.value.toLowerCase();
-    const filtered = playlist
-      .map((track, i) => ({ track, i }))
-      .filter(obj => obj.track.title.toLowerCase().includes(query));
-    playOrder = filtered.map(obj => obj.i);
-    currentOrderIdx = 0;
-    if (playOrder.length > 0) loadTrack(playOrder[currentOrderIdx]);
-    renderPlaylist();
-  });
-
-  // --- End of Song ---
-  audio.addEventListener('ended', () => {
-    if (isRepeat) {
-      audio.currentTime = 0;
-      playTrack();
-    } else {
-      currentOrderIdx = (currentOrderIdx + 1) % playOrder.length;
-      loadTrack(playOrder[currentOrderIdx]);
-      playTrack();
-    }
-  });
-
-  // --- Progress Bar ---
-  audio.addEventListener('timeupdate', () => {
-    if (!audio.duration) return;
-    const percent = (audio.currentTime / audio.duration) * 100;
-    progressBar.style.width = percent + '%';
-    updateTimestamp();
-  });
-
-  // --- Seek ---
-  const progressBarContainer = document.getElementById('progress-bar');
-  progressBarContainer.onclick = (e) => {
-    if (!audio.duration) return;
-    const rect = e.target.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percent = x / rect.width;
-    audio.currentTime = percent * audio.duration;
-  };
-
-  // --- Helpers ---
-  function resetProgress() {
-    progressBar.style.width = '0%';
-    timestampEl.textContent = '00:00 / 00:00';
-  }
-  function updateTimestamp() {
-    if (!audio.duration) {
-      timestampEl.textContent = '00:00 / 00:00';
-      return;
-    }
-    const current = formatTime(audio.currentTime);
-    const total = formatTime(audio.duration);
-    timestampEl.textContent = `${current} / ${total}`;
-  }
-  function formatTime(sec) {
-    sec = Math.floor(sec);
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-  }
-
-  // --- Start ---
-  fetchPlaylist();
+themeToggleBtn.onclick = function() {
+  isDarkMode = !isDarkMode;
+  document.body.classList.toggle('light-mode', !isDarkMode);
+  themeToggleBtn.textContent = isDarkMode ? '🌙' : '☀️';
 };
+const searchBarEl = document.getElementById('search-bar');
+let filteredPlaylist = [];
+// Timestamp display
+const timestampEl = document.getElementById('timestamp');
+
+function updateTimestamp() {
+  if (!audio.duration) {
+    timestampEl.textContent = '00:00 / 00:00';
+    return;
+  }
+  const current = formatTime(audio.currentTime);
+  const total = formatTime(audio.duration);
+  timestampEl.textContent = `${current} / ${total}`;
+}
+
+function formatTime(sec) {
+  sec = Math.floor(sec);
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+}
+// Music Player Script
+const songsFolder = 'songs/';
+const defaultCover = 'cover.png'; // Place a default image in your repo
+const playlistEl = document.getElementById('playlist');
+const trackTitleEl = document.getElementById('track-title');
+const albumArtEl = document.getElementById('album-art');
+const trackArtistEl = document.getElementById('track-artist');
+const playBtn = document.getElementById('play');
+const prevBtn = document.getElementById('prev');
+const nextBtn = document.getElementById('next');
+const shuffleBtn = document.getElementById('shuffle');
+const progressBar = document.getElementById('progress');
+let audio = new Audio();
+let playlist = [];
+let currentTrack = 0;
+let isPlaying = false;
+let isShuffling = false;
+let shuffledOrder = [];
+
+// Try to fetch all .mp3 files from the songs folder
+async function fetchPlaylist() {
+  // GitHub Pages doesn't allow directory listing, so you must hardcode or generate this list
+  // For demo, let's try to fetch a playlist.json, fallback to hardcoded
+  try {
+    const res = await fetch(songsFolder + 'playlist.json');
+    if (res.ok) {
+      playlist = await res.json();
+    } else {
+      throw new Error('No playlist.json');
+    }
+  } catch {
+    // Fallback: hardcoded list (update with your actual files)
+    playlist = [
+      { "title": "JD entry", "file": "JD entry.mp3" },
+      { "title": "Big bad beast", "file": "Big bad beast.mp3" },
+  { "title": "Master Entry", "file": "Master Entry.mp3" },
+  { "title": "JD badass", "file": "JD badass.mp3" },
+  { "title": "Rolex Theme", "file": "Rolex Theme.mp3" }
+    ];
+  }
+  filteredPlaylist = playlist;
+  renderPlaylist();
+  loadTrack(0);
+  // Wait for user interaction to start playback
+}
+
+function renderPlaylist() {
+  playlistEl.innerHTML = '';
+  let order = isShuffling ? shuffledOrder : Array.from(filteredPlaylist.keys());
+  order.forEach((idx) => {
+    const track = filteredPlaylist[idx];
+    const li = document.createElement('li');
+    li.textContent = track.title;
+    li.className = playlist.indexOf(track) === currentTrack ? 'active' : '';
+    li.onclick = () => {
+      loadTrack(playlist.indexOf(track));
+      playTrack();
+    };
+    playlistEl.appendChild(li);
+  });
+}
+searchBarEl.addEventListener('input', function() {
+  const query = this.value.toLowerCase();
+  filteredPlaylist = playlist.filter(track => track.title.toLowerCase().includes(query) || (track.artist && track.artist.toLowerCase().includes(query)));
+  renderPlaylist();
+});
+
+function loadTrack(idx) {
+  currentTrack = idx;
+  const track = playlist[idx];
+  audio.src = songsFolder + track.file;
+  trackTitleEl.textContent = track.title;
+  trackArtistEl.textContent = track.artist || '';
+  albumArtEl.src = track.cover ? songsFolder + track.cover : 'cover.png';
+  albumArtEl.onerror = () => { albumArtEl.src = 'cover.png'; };
+  renderPlaylist();
+  resetProgress();
+}
+
+function playTrack() {
+  audio.play();
+  isPlaying = true;
+  playBtn.innerHTML = '&#10073;&#10073;'; // Pause icon
+}
+
+function pauseTrack() {
+  audio.pause();
+  isPlaying = false;
+  playBtn.innerHTML = '&#9654;'; // Play icon
+}
+
+playBtn.onclick = () => {
+  if (isPlaying) {
+    pauseTrack();
+  } else {
+    playTrack();
+  }
+};
+
+prevBtn.onclick = () => {
+  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
+  let idx = order.indexOf(currentTrack);
+  idx = (idx - 1 + order.length) % order.length;
+  loadTrack(order[idx]);
+  playTrack(); // Autoplay on prev
+};
+
+nextBtn.onclick = () => {
+  let order = isShuffling ? shuffledOrder : Array.from(playlist.keys());
+  let idx = order.indexOf(currentTrack);
+  idx = (idx + 1) % order.length;
+  loadTrack(order[idx]);
+  playTrack(); // Autoplay on next
+};
+
+shuffleBtn.onclick = () => {
+  isShuffling = !isShuffling;
+  if (isShuffling) {
+    shuffledOrder = Array.from(playlist.keys());
+    for (let i = shuffledOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffledOrder[i], shuffledOrder[j]] = [shuffledOrder[j], shuffledOrder[i]];
+    }
+    shuffleBtn.style.background = '#ff6e7f';
+  } else {
+    shuffleBtn.style.background = '';
+  }
+  renderPlaylist();
+};
+
+audio.addEventListener('ended', () => {
+  nextBtn.click();
+});
+
+audio.addEventListener('timeupdate', () => {
+  const percent = (audio.currentTime / audio.duration) * 100;
+  progressBar.style.width = percent + '%';
+  updateTimestamp();
+});
+
+document.getElementById('progress-bar').onclick = (e) => {
+  const rect = e.target.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const percent = x / rect.width;
+  audio.currentTime = percent * audio.duration;
+};
+
+function resetProgress() {
+  progressBar.style.width = '0%';
+}
+
+// Cover image removed from HTML, so no error handler needed
+
+// Start
+fetchPlaylist();
