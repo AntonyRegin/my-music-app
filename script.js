@@ -168,6 +168,7 @@ repeatBtn.onclick = () => {
 audio.addEventListener('ended', () => {
   if (isRepeat) {
     audio.currentTime = 0;
+    nextBtn.click();
     playTrack();
   } else {
     nextBtn.click();
