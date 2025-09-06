@@ -227,6 +227,21 @@ body {
   letter-spacing: 0.05em;
   backdrop-filter: blur(4px);
 }
+.controls #timestamp {
+  position: static;
+  top: unset;
+  right: unset;
+  background: rgba(34, 40, 49, 0.5);
+  color: #fff;
+  font-size: 1.1rem;
+  padding: 0.4rem 1.2rem;
+  border-radius: 2rem;
+  box-shadow: 0 2px 8px #43cea233;
+  z-index: 2;
+  letter-spacing: 0.05em;
+  backdrop-filter: blur(4px);
+  margin-left: 0.5rem;
+}
 #playlist li.active {
   background: linear-gradient(90deg, #ff6e7f, #43cea2);
   color: #232526;
@@ -275,14 +290,4 @@ body {
     font-size: 0.95rem;
     padding: 0.5rem 0.7rem;
   }
-}
-#album-art {
-  width: 160px;
-  height: 160px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 4px 32px #43cea2, 0 0 32px #ff6e7f99;
-  margin-bottom: 1.5rem;
-  background: rgba(255,255,255,0.18);
-  border: 2.5px solid rgba(255,255,255,0.25);
 }
